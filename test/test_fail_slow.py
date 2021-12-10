@@ -14,7 +14,7 @@ import pytest
             "def test_func():\n"
             "    sleep(10)\n"
             "    assert 2 + 2 == 4\n",
-            False,
+            True,
             True,
         ),
         (
@@ -34,8 +34,15 @@ import pytest
 )
 def test_fail_slow(pytester, src: str, success: bool, slow: bool) -> None:
     pytester.makepyfile(test_func=src)
-    result = pytester.runpytest("--fail-slow=5")
+    result = pytester.runpytest()
     if success:
+        result.assert_outcomes(passed=1)
+    else:
+        result.assert_outcomes(failed=1)
+    result.stdout.no_fnmatch_line("Test took too long to run*")
+
+    result = pytester.runpytest("--fail-slow=5")
+    if success and not slow:
         result.assert_outcomes(passed=1)
     else:
         result.assert_outcomes(failed=1)

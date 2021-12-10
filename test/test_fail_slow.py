@@ -39,7 +39,7 @@ def test_fail_slow(pytester, src: str, success: bool, slow: bool) -> None:
         result.assert_outcomes(passed=1)
     else:
         result.assert_outcomes(failed=1)
-    result.stdout.no_fnmatch_line("Test took too long to run*")
+    result.stdout.no_fnmatch_line("*Test took too long to run*")
 
     result = pytester.runpytest("--fail-slow=5")
     if success and not slow:
@@ -47,6 +47,12 @@ def test_fail_slow(pytester, src: str, success: bool, slow: bool) -> None:
     else:
         result.assert_outcomes(failed=1)
     if slow:
-        result.stdout.fnmatch_lines(["Test took too long to run: Duration *s > 5*s"])
+        result.stdout.re_match_lines(
+            [
+                r"_+ test_func _+$",
+                r"Test took too long to run: Duration \d+\.\d+s > 5\.\d+s$",
+            ],
+            consecutive=True,
+        )
     else:
-        result.stdout.no_fnmatch_line("Test took too long to run: Duration *s > 5*s")
+        result.stdout.no_fnmatch_line("*Test took too long to run*")

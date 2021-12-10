@@ -68,6 +68,7 @@ def pytest_runtest_makereport(item, call):
     ):
         report.outcome = "failed"
         report.longrepr = (
-            f"Test took too long to run: Duration {call.duration}s > {timeout}s"
+            f"Test passed but took too long to run: Duration {call.duration}s >"
+            f" {timeout}s"
         )
     return report

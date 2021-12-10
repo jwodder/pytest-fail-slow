@@ -28,7 +28,7 @@ completion; if you want them to instead be stopped early, use pytest-timeout_.
 
 A duration can be supplied to the ``--fail-slow`` option as either a bare
 floating-point number of seconds or as a floating-point number followed by one
-of the following units:
+of the following units (case insensitive):
 
 - ``h``, ``hour``, ``hours``
 - ``m``, ``min``, ``mins``, ``minute``, ``minutes``

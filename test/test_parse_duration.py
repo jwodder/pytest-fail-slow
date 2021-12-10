@@ -52,6 +52,7 @@ from pytest_fail_slow import parse_duration
 def test_parse_duration(number: str, unit: str, mul: float) -> None:
     assert parse_duration(number + unit) == float(number) * mul
     assert parse_duration(number + " " + unit) == float(number) * mul
+    assert parse_duration(number + unit.upper()) == float(number) * mul
 
 
 @pytest.mark.parametrize(

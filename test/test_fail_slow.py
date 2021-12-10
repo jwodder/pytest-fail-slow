@@ -30,6 +30,21 @@ import pytest
             False,
             False,
         ),
+        (
+            "from time import sleep\n"
+            "import pytest\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def slow_setup():\n"
+            "    sleep(3)\n"
+            "    yield\n"
+            "    sleep(3)\n"
+            "\n"
+            "def test_func(slow_setup):\n"
+            "    assert 2 + 2 == 4\n",
+            True,
+            False,
+        ),
     ],
 )
 def test_fail_slow(pytester, src: str, success: bool, slow: bool) -> None:

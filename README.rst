@@ -42,6 +42,11 @@ test's duration and the duration threshold, like so::
     ________________________________ test_func ________________________________
     Test passed but took too long to run: Duration 123.0s > 5.0s
 
+**Note:** Only the durations for tests themselves are taken into consideration.
+If a test passes in less than the specified duration, but one or more fixture
+setups/teardowns take longer than the duration, the test will still be marked
+as passing.
+
 
 Installation
 ============

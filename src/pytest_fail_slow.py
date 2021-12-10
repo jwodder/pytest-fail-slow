@@ -10,14 +10,48 @@ __author_email__ = "pytest-fail-slow@varonathe.org"
 __license__ = "MIT"
 __url__ = "https://github.com/jwodder/pytest-fail-slow"
 
+import re
 import pytest
+
+TIME_UNITS = {
+    "hour": 3600.0,
+    "min": 60.0,
+    "sec": 1.0,
+    "ms": 0.001,
+    "us": 0.000001,
+}
+
+
+def parse_duration(s: str) -> float:
+    m = re.search(
+        r"""
+        (?<=[\d\s.])
+        (?:
+            (?P<hour>h(ours?)?)
+            |(?P<min>m(in(ute)?s?)?)
+            |(?P<sec>s(ec(ond)?s?)?)
+            |(?P<ms>m(illi)?s(ec(ond)?s?)?|milli)
+            |(?P<us>(μ|u|micro)s(ec(ond)?s?)?|micro)
+        )\s*$
+    """,
+        s,
+        flags=re.I | re.X,
+    )
+    if m:
+        (unit,) = [k for k, v in m.groupdict().items() if v is not None]
+        mul = TIME_UNITS[unit.lower()]
+        s = s[: m.start()]
+    else:
+        mul = 1.0
+    return float(s) * mul
 
 
 def pytest_addoption(parser) -> None:
     parser.addoption(
         "--fail-slow",
-        type=float,
-        help="Fail tests that take more than this many seconds to run",
+        type=parse_duration,
+        metavar="DURATION",
+        help="Fail tests that take more than this long to run",
     )
 
 

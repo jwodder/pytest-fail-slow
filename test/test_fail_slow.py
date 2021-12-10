@@ -12,7 +12,7 @@ import pytest
         (
             "from time import sleep\n"
             "def test_func():\n"
-            "    sleep(10)\n"
+            "    sleep(5)\n"
             "    assert 2 + 2 == 4\n",
             True,
             True,
@@ -25,7 +25,7 @@ import pytest
         (
             "from time import sleep\n"
             "def test_func():\n"
-            "    sleep(10)\n"
+            "    sleep(5)\n"
             "    assert 2 + 2 == 5\n",
             False,
             False,
@@ -41,7 +41,7 @@ def test_fail_slow(pytester, src: str, success: bool, slow: bool) -> None:
         result.assert_outcomes(failed=1)
     result.stdout.no_fnmatch_line("*Test took too long to run*")
 
-    result = pytester.runpytest("--fail-slow=5")
+    result = pytester.runpytest("--fail-slow=2")
     if success and not slow:
         result.assert_outcomes(passed=1)
     else:
@@ -50,7 +50,23 @@ def test_fail_slow(pytester, src: str, success: bool, slow: bool) -> None:
         result.stdout.re_match_lines(
             [
                 r"_+ test_func _+$",
-                r"Test took too long to run: Duration \d+\.\d+s > 5\.\d+s$",
+                r"Test took too long to run: Duration \d+\.\d+s > 2\.\d+s$",
+            ],
+            consecutive=True,
+        )
+    else:
+        result.stdout.no_fnmatch_line("*Test took too long to run*")
+
+    result = pytester.runpytest("--fail-slow=0.0333m")
+    if success and not slow:
+        result.assert_outcomes(passed=1)
+    else:
+        result.assert_outcomes(failed=1)
+    if slow:
+        result.stdout.re_match_lines(
+            [
+                r"_+ test_func _+$",
+                r"Test took too long to run: Duration \d+\.\d+s > 1\.9\d+s$",
             ],
             consecutive=True,
         )

@@ -1,0 +1,52 @@
+.. image:: http://www.repostatus.org/badges/latest/wip.svg
+    :target: http://www.repostatus.org/#wip
+    :alt: Project Status: WIP — Initial development is in progress, but there
+          has not yet been a stable, usable release suitable for the public.
+
+.. image:: https://github.com/jwodder/pytest-fail-slow/workflows/Test/badge.svg?branch=master
+    :target: https://github.com/jwodder/pytest-fail-slow/actions?workflow=Test
+    :alt: CI Status
+
+.. image:: https://codecov.io/gh/jwodder/pytest-fail-slow/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/jwodder/pytest-fail-slow
+
+.. image:: https://img.shields.io/github/license/jwodder/pytest-fail-slow.svg
+    :target: https://opensource.org/licenses/MIT
+    :alt: MIT License
+
+`GitHub <https://github.com/jwodder/pytest-fail-slow>`_
+| `Issues <https://github.com/jwodder/pytest-fail-slow/issues>`_
+
+``pytest-fail-slow`` is a pytest_ plugin for making tests fail that take too
+long to run.  It adds a ``--fail-slow DURATION`` command-line option to pytest
+that causes any otherwise-passing tests that run for longer than the given
+duration to be marked as failures.  Note that slow tests will still be run to
+completion; if you want them to instead be stopped early, use pytest-timeout_.
+
+.. _pytest: https://docs.pytest.org
+.. _pytest-timeout: https://github.com/pytest-dev/pytest-timeout
+
+A duration can be supplied to the ``--fail-slow`` option as either a bare
+floating-point number of seconds or as a floating-point number followed by one
+of the following units:
+
+- ``h`, ``hour``, ``hours``
+- ``m``, ``min``, ``mins``, ``minute``, ``minutes``
+- ``s``, ``sec``, ``secs``, ``second``, ``seconds``
+- ``ms``, ``milli``, ``millisec``, ``milliseconds``
+- ``us``, ``μs``, ``micro``, ``microsec``, ``microseconds``
+
+If ``pytest-fail-slow`` marks a test as a failure, the output will include the
+test's duration and the duration threshold, like so::
+
+    ________________________________ test_func ________________________________
+    Test passed but took too long to run: Duration 123.0s > 5.0s
+
+
+Installation
+============
+``pytest-fail-slow`` requires Python 3.6 or higher and pytest 6.0 or higher.
+Just use `pip <https://pip.pypa.io>`_ for Python 3 (You have pip, right?) to
+install it::
+
+    python3 -m pip install pytest-fail-slow

@@ -101,4 +101,3 @@ def pytest_runtest_makereport(item, call):
             f"Test passed but took too long to run: Duration {call.duration}s >"
             f" {timeout}s"
         )
-    return report

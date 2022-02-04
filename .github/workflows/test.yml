@@ -21,7 +21,9 @@ jobs:
           - 'pypy-3.6'
           - 'pypy-3.7'
           - 'pypy-3.8'
-        toxenv: [py]
+        toxenv:
+          - py-pytest6
+          - py-pytest7
         include:
           - python-version: '3.6'
             toxenv: lint
@@ -43,11 +45,11 @@ jobs:
         run: tox -e ${{ matrix.toxenv }}
 
       - name: Generate XML coverage report
-        if: matrix.toxenv == 'py'
+        if: startsWith(matrix.toxenv, 'py')
         run: coverage xml
 
       - name: Upload coverage to Codecov
-        if: matrix.toxenv == 'py'
+        if: startsWith(matrix.toxenv, 'py')
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: false

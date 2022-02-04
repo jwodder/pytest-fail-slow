@@ -20,6 +20,7 @@
 `GitHub <https://github.com/jwodder/pytest-fail-slow>`_
 | `PyPI <https://pypi.org/project/pytest-fail-slow/>`_
 | `Issues <https://github.com/jwodder/pytest-fail-slow/issues>`_
+| `Changelog <https://github.com/jwodder/pytest-fail-slow/blob/master/CHANGELOG.md>`_
 
 ``pytest-fail-slow`` is a pytest_ plugin for making tests fail that take too
 long to run.  It adds a ``--fail-slow DURATION`` command-line option to pytest

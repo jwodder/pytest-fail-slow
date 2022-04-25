@@ -24,9 +24,15 @@
 
 ``pytest-fail-slow`` is a pytest_ plugin for making tests fail that take too
 long to run.  It adds a ``--fail-slow DURATION`` command-line option to pytest
-that causes any otherwise-passing tests that run for longer than the given
-duration to be marked as failures.  Note that slow tests will still be run to
-completion; if you want them to instead be stopped early, use pytest-timeout_.
+that causes any & all otherwise-passing tests that run for longer than the
+given duration to be marked as failures, and it adds a
+``@pytest.mark.fail_slow(DURATION)`` marker for making an individual test fail
+if it runs for longer than the given duration.  If ``--fail-slow`` is given and
+a test has the ``@fail_slow()`` marker, the duration given by the marker takes
+precedence for that test.
+
+Note that slow tests will still be run to completion; if you want them to
+instead be stopped early, use pytest-timeout_.
 
 .. _pytest: https://docs.pytest.org
 .. _pytest-timeout: https://github.com/pytest-dev/pytest-timeout
@@ -40,6 +46,10 @@ of the following units (case insensitive):
 - ``s``, ``sec``, ``secs``, ``second``, ``seconds``
 - ``ms``, ``milli``, ``millisec``, ``milliseconds``
 - ``us``, ``μs``, ``micro``, ``microsec``, ``microseconds``
+
+Durations passed to the ``@pytest.mark.fail_slow()`` marker can be either
+ints/floats (for a number of seconds) or strings in the same format as passed
+to ``--fail-slow``.
 
 If ``pytest-fail-slow`` marks a test as a failure, the output will include the
 test's duration and the duration threshold, like so::

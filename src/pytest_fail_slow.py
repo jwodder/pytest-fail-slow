@@ -3,9 +3,15 @@ Fail tests that take too long to run
 
 ``pytest-fail-slow`` is a pytest_ plugin for making tests fail that take too
 long to run.  It adds a ``--fail-slow DURATION`` command-line option to pytest
-that causes any otherwise-passing tests that run for longer than the given
-duration to be marked as failures.  Note that slow tests will still be run to
-completion; if you want them to instead be stopped early, use pytest-timeout_.
+that causes any & all otherwise-passing tests that run for longer than the
+given duration to be marked as failures, and it adds a
+``@pytest.mark.fail_slow(DURATION)`` marker for making an individual test fail
+if it runs for longer than the given duration.  If ``--fail-slow`` is given and
+a test has the ``@fail_slow()`` marker, the duration given by the marker takes
+precedence for that test.
+
+Note that slow tests will still be run to completion; if you want them to
+instead be stopped early, use pytest-timeout_.
 
 .. _pytest: https://docs.pytest.org
 .. _pytest-timeout: https://github.com/pytest-dev/pytest-timeout
@@ -19,6 +25,10 @@ of the following units (case insensitive):
 - ``s``, ``sec``, ``secs``, ``second``, ``seconds``
 - ``ms``, ``milli``, ``millisec``, ``milliseconds``
 - ``us``, ``μs``, ``micro``, ``microsec``, ``microseconds``
+
+Durations passed to the ``@pytest.mark.fail_slow()`` marker can be either
+ints/floats (for a number of seconds) or strings in the same format as passed
+to ``--fail-slow``.
 
 If ``pytest-fail-slow`` marks a test as a failure, the output will include the
 test's duration and the duration threshold, like so::
@@ -40,6 +50,7 @@ __author_email__ = "pytest-fail-slow@varonathe.org"
 __license__ = "MIT"
 __url__ = "https://github.com/jwodder/pytest-fail-slow"
 
+from numbers import Number
 import re
 import pytest
 
@@ -52,7 +63,9 @@ TIME_UNITS = {
 }
 
 
-def parse_duration(s: str) -> float:
+def parse_duration(s) -> float:
+    if isinstance(s, Number):
+        return s
     m = re.search(
         r"""
         (?<=[\d\s.])
@@ -76,6 +89,13 @@ def parse_duration(s: str) -> float:
     return float(s) * mul
 
 
+def pytest_configure(config) -> None:
+    config.addinivalue_line(
+        "markers",
+        "fail_slow(duration): Fail test if it takes more than this long to run",
+    )
+
+
 def pytest_addoption(parser) -> None:
     parser.addoption(
         "--fail-slow",
@@ -88,7 +108,11 @@ def pytest_addoption(parser) -> None:
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     report = (yield).get_result()
-    timeout = item.config.getoption("--fail-slow")
+    mark = item.get_closest_marker("fail_slow")
+    if mark is not None and len(mark.args) > 0:
+        timeout = parse_duration(mark.args[0])
+    else:
+        timeout = item.config.getoption("--fail-slow")
     if (
         report is not None
         and timeout is not None

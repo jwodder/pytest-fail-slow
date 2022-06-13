@@ -13,6 +13,10 @@
 .. image:: https://img.shields.io/pypi/pyversions/pytest-fail-slow.svg
     :target: https://pypi.org/project/pytest-fail-slow/
 
+.. image:: https://img.shields.io/conda/vn/conda-forge/pytest-fail-slow.svg
+    :target: https://anaconda.org/conda-forge/pytest-fail-slow
+    :alt: Conda Version
+
 .. image:: https://img.shields.io/github/license/jwodder/pytest-fail-slow.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License

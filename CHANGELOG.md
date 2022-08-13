@@ -1,5 +1,5 @@
-v0.3.0 (in development)
------------------------
+v0.3.0 (2022-08-12)
+-------------------
 - The `@pytest.mark.fail_slow()` marker now errors if not given exactly one
   argument.  Previously, it would either use the first argument or, if no
   arguments were given, it would be ignored.

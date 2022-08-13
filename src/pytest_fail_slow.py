@@ -44,7 +44,7 @@ as passing.
 Visit <https://github.com/jwodder/pytest-fail-slow> for more information.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0.dev1"
 __author__ = "John Thorvald Wodder II"
 __author_email__ = "pytest-fail-slow@varonathe.org"
 __license__ = "MIT"
@@ -109,7 +109,11 @@ def pytest_addoption(parser) -> None:
 def pytest_runtest_makereport(item, call):
     report = (yield).get_result()
     mark = item.get_closest_marker("fail_slow")
-    if mark is not None and len(mark.args) > 0:
+    if mark is not None:
+        if len(mark.args) != 1:
+            raise pytest.UsageError(
+                "@pytest.mark.fail_slow() takes exactly one argument"
+            )
         timeout = parse_duration(mark.args[0])
     else:
         timeout = item.config.getoption("--fail-slow")

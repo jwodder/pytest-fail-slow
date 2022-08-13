@@ -99,3 +99,22 @@ def test_fail_slow_threshold(
         )
     else:
         result.stdout.no_fnmatch_line("*Test passed but took too long to run*")
+
+
+@pytest.mark.parametrize("args", ["", "42, 'foo'"])
+def test_fail_slow_marker_bad_args(pytester, args: str) -> None:
+    pytester.makepyfile(
+        test_func=(
+            "import pytest\n"
+            "\n"
+            f"@pytest.mark.fail_slow({args})\n"
+            "def test_func():\n"
+            "    assert 2 + 2 == 4\n"
+        )
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes()
+    result.stdout.no_fnmatch_line("?")
+    result.stderr.fnmatch_lines(
+        ["ERROR: @pytest.mark.fail_slow() takes exactly one argument"]
+    )

@@ -44,7 +44,7 @@ as passing.
 Visit <https://github.com/jwodder/pytest-fail-slow> for more information.
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0.dev1"
 __author__ = "John Thorvald Wodder II"
 __author_email__ = "pytest-fail-slow@varonathe.org"
 __license__ = "MIT"

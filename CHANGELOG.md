@@ -1,3 +1,7 @@
+v0.4.0 (in development)
+-----------------------
+- Drop support for Python 3.6
+
 v0.3.0 (2022-08-12)
 -------------------
 - The `@pytest.mark.fail_slow()` marker now errors if not given exactly one

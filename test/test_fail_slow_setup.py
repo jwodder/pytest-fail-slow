@@ -50,3 +50,39 @@ def test_fail_slow_setup_threshold(
             ],
             consecutive=True,
         )
+
+
+@pytest.mark.parametrize("threshold,limitrgx", [(4, "4s"), (10, None)])
+def test_fail_slow_multi_setup(pytester, threshold: str, limitrgx: str | None) -> None:
+    pytester.makepyfile(
+        test_func=(
+            "from time import sleep\n"
+            "import pytest\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def slow_setup():\n"
+            "    sleep(2)\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def slower_setup():\n"
+            "    sleep(3)\n"
+            "\n"
+            f"@pytest.mark.fail_slow_setup({threshold})\n"
+            "def test_func(slow_setup, slower_setup):\n"
+            "    assert 2 + 2 == 4\n"
+        )
+    )
+    result = pytester.runpytest()
+    if limitrgx is None:
+        result.assert_outcomes(passed=1)
+        result.stdout.no_fnmatch_line("*Setup passed but took too long to run*")
+    else:
+        result.assert_outcomes(errors=1)
+        result.stdout.re_match_lines(
+            [
+                r"_+ ERROR at setup of test_func _+$",
+                "Setup passed but took too long to run:"
+                rf" Duration \d+\.\d+s > {limitrgx}$",
+            ],
+            consecutive=True,
+        )

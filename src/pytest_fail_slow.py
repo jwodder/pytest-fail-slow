@@ -94,6 +94,13 @@ def pytest_configure(config) -> None:
         "markers",
         "fail_slow(duration): Fail test if it takes more than this long to run",
     )
+    config.addinivalue_line(
+        "markers",
+        (
+            "fail_slow_setup(duration):"
+            " Fail test if it takes more than this long to set up"
+        ),
+    )
 
 
 def pytest_addoption(parser) -> None:
@@ -103,29 +110,48 @@ def pytest_addoption(parser) -> None:
         metavar="DURATION",
         help="Fail tests that take more than this long to run",
     )
+    parser.addoption(
+        "--fail-slow-setup",
+        type=parse_duration,
+        metavar="DURATION",
+        help="Fail tests that take more than this long to set up",
+    )
 
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     report = (yield).get_result()
-    mark = item.get_closest_marker("fail_slow")
-    if mark is not None:
-        if len(mark.args) != 1:
-            raise pytest.UsageError(
-                "@pytest.mark.fail_slow() takes exactly one argument"
+    if report is None or report.outcome != "passed":
+        return
+    if report.when == "setup":
+        mark = item.get_closest_marker("fail_slow_setup")
+        if mark is not None:
+            if len(mark.args) != 1:
+                raise pytest.UsageError(
+                    "@pytest.mark.fail_slow_setup() takes exactly one argument"
+                )
+            timeout = parse_duration(mark.args[0])
+        else:
+            timeout = item.config.getoption("--fail-slow-setup")
+        if timeout is not None and call.duration > timeout:
+            report.outcome = "failed"
+            report.longrepr = (
+                "Setup passed but took too long to run:"
+                f" Duration {call.duration}s > {timeout}s"
             )
-        timeout = parse_duration(mark.args[0])
-    else:
-        timeout = item.config.getoption("--fail-slow")
-    if (
-        report is not None
-        and timeout is not None
-        and report.when == "call"
-        and report.outcome == "passed"
-        and call.duration > timeout
-    ):
-        report.outcome = "failed"
-        report.longrepr = (
-            f"Test passed but took too long to run: Duration {call.duration}s >"
-            f" {timeout}s"
-        )
+    elif report.when == "call":
+        mark = item.get_closest_marker("fail_slow")
+        if mark is not None:
+            if len(mark.args) != 1:
+                raise pytest.UsageError(
+                    "@pytest.mark.fail_slow() takes exactly one argument"
+                )
+            timeout = parse_duration(mark.args[0])
+        else:
+            timeout = item.config.getoption("--fail-slow")
+        if timeout is not None and call.duration > timeout:
+            report.outcome = "failed"
+            report.longrepr = (
+                "Test passed but took too long to run:"
+                f" Duration {call.duration}s > {timeout}s"
+            )

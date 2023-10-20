@@ -86,3 +86,29 @@ def test_fail_slow_multi_setup(pytester, threshold: str, limitrgx: str | None) -
             ],
             consecutive=True,
         )
+
+
+@pytest.mark.parametrize("threshold,success", [(2, False), (5, True)])
+def test_fail_slow_setup_skips_test(pytester, threshold: str, success: bool) -> None:
+    pytester.makepyfile(
+        test_func=(
+            "from pathlib import Path\n"
+            "from time import sleep\n"
+            "import pytest\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def slow_setup():\n"
+            "    sleep(3)\n"
+            "\n"
+            f"@pytest.mark.fail_slow_setup({threshold})\n"
+            "def test_func(slow_setup):\n"
+            '    Path("test.txt").write_text("Tested\\n")\n'
+        )
+    )
+    result = pytester.runpytest()
+    if success:
+        result.assert_outcomes(passed=1)
+        assert (pytester.path / "test.txt").read_text() == "Tested\n"
+    else:
+        result.assert_outcomes(errors=1)
+        assert not (pytester.path / "test.txt").exists()

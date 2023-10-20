@@ -112,3 +112,26 @@ def test_fail_slow_setup_skips_test(pytester, threshold: str, success: bool) -> 
     else:
         result.assert_outcomes(errors=1)
         assert not (pytester.path / "test.txt").exists()
+
+
+def test_fail_slow_setup_teardown_still_run(pytester) -> None:
+    pytester.makepyfile(
+        test_func=(
+            "from pathlib import Path\n"
+            "from time import sleep\n"
+            "import pytest\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def slow_setup():\n"
+            "    sleep(3)\n"
+            "    yield\n"
+            '    Path("teardown.txt").write_text("Torn down\\n")\n'
+            "\n"
+            "@pytest.mark.fail_slow_setup(2)\n"
+            "def test_func(slow_setup):\n"
+            "    assert 2 + 2 == 4\n"
+        )
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    assert (pytester.path / "teardown.txt").read_text() == "Torn down\n"

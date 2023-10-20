@@ -1,45 +1,16 @@
 """
 Fail tests that take too long to run
 
-``pytest-fail-slow`` is a pytest_ plugin for making tests fail that take too
-long to run.  It adds a ``--fail-slow DURATION`` command-line option to pytest
-that causes any & all otherwise-passing tests that run for longer than the
-given duration to be marked as failures, and it adds a
-``@pytest.mark.fail_slow(DURATION)`` marker for making an individual test fail
-if it runs for longer than the given duration.  If ``--fail-slow`` is given and
-a test has the ``@fail_slow()`` marker, the duration given by the marker takes
-precedence for that test.
+``pytest-fail-slow`` is a pytest_ plugin for treating tests as failed if they
+took too long to run.  It adds markers for failing tests if they or their setup
+stages run for longer than a given duration, along with command-line options
+for applying the same cutoff to all tests.
 
 Note that slow tests will still be run to completion; if you want them to
 instead be stopped early, use pytest-timeout_.
 
 .. _pytest: https://docs.pytest.org
 .. _pytest-timeout: https://github.com/pytest-dev/pytest-timeout
-
-A duration can be supplied to the ``--fail-slow`` option as either a bare
-floating-point number of seconds or as a floating-point number followed by one
-of the following units (case insensitive):
-
-- ``h``, ``hour``, ``hours``
-- ``m``, ``min``, ``mins``, ``minute``, ``minutes``
-- ``s``, ``sec``, ``secs``, ``second``, ``seconds``
-- ``ms``, ``milli``, ``millisec``, ``milliseconds``
-- ``us``, ``μs``, ``micro``, ``microsec``, ``microseconds``
-
-Durations passed to the ``@pytest.mark.fail_slow()`` marker can be either
-ints/floats (for a number of seconds) or strings in the same format as passed
-to ``--fail-slow``.
-
-If ``pytest-fail-slow`` marks a test as a failure, the output will include the
-test's duration and the duration threshold, like so::
-
-    ________________________________ test_func ________________________________
-    Test passed but took too long to run: Duration 123.0s > 5.0s
-
-**Note:** Only the durations for tests themselves are taken into consideration.
-If a test passes in less than the specified duration, but one or more fixture
-setups/teardowns take longer than the duration, the test will still be marked
-as passing.
 
 Visit <https://github.com/jwodder/pytest-fail-slow> for more information.
 """

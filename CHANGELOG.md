@@ -2,6 +2,8 @@ v0.4.0 (in development)
 -----------------------
 - Drop support for Python 3.6
 - Support Python 3.11 and 3.12
+- Added `@pytest.mark.fail_slow_setup()` marker and `--fail-slow-setup`
+  command-line option for failing tests whose setups take too long to run
 
 v0.3.0 (2022-08-12)
 -------------------

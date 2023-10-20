@@ -135,3 +135,28 @@ def test_fail_slow_setup_teardown_still_run(pytester) -> None:
     result = pytester.runpytest()
     result.assert_outcomes(errors=1)
     assert (pytester.path / "teardown.txt").read_text() == "Torn down\n"
+
+
+def test_fail_slow_setup_all_run(pytester) -> None:
+    pytester.makepyfile(
+        test_func=(
+            "from pathlib import Path\n"
+            "from time import sleep\n"
+            "import pytest\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def slow_setup():\n"
+            "    sleep(3)\n"
+            "\n"
+            "@pytest.fixture\n"
+            "def quick_setup():\n"
+            '    Path("quick.txt").write_text("Set up\\n")\n'
+            "\n"
+            "@pytest.mark.fail_slow_setup(2)\n"
+            "def test_func(slow_setup, quick_setup):\n"
+            "    assert 2 + 2 == 4\n"
+        )
+    )
+    result = pytester.runpytest()
+    result.assert_outcomes(errors=1)
+    assert (pytester.path / "quick.txt").read_text() == "Set up\n"

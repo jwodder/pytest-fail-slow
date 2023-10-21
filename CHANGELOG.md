@@ -1,5 +1,5 @@
-v0.4.0 (in development)
------------------------
+v0.4.0 (2023-10-21)
+-------------------
 - Drop support for Python 3.6
 - Support Python 3.11 and 3.12
 - Added `@pytest.mark.fail_slow_setup()` marker and `--fail-slow-setup`

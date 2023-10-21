@@ -1,4 +1,4 @@
-from typing import List
+from __future__ import annotations
 import pytest
 
 CASES = [
@@ -78,7 +78,7 @@ def test_fail_slow_threshold(
     src: str,
     success: bool,
     slow: bool,
-    args: List[str],
+    args: list[str],
     decor: str,
     limitrgx: str,
 ) -> None:

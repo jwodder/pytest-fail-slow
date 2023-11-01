@@ -1,10 +1,10 @@
-.. image:: http://www.repostatus.org/badges/latest/active.svg
-    :target: http://www.repostatus.org/#active
+.. image:: https://www.repostatus.org/badges/latest/active.svg
+    :target: https://www.repostatus.org/#active
     :alt: Project Status: Active — The project has reached a stable, usable
           state and is being actively developed.
 
-.. image:: https://github.com/jwodder/pytest-fail-slow/workflows/Test/badge.svg?branch=master
-    :target: https://github.com/jwodder/pytest-fail-slow/actions?workflow=Test
+.. image:: https://github.com/jwodder/pytest-fail-slow/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/jwodder/pytest-fail-slow/actions/workflows/test.yml
     :alt: CI Status
 
 .. image:: https://codecov.io/gh/jwodder/pytest-fail-slow/branch/master/graph/badge.svg

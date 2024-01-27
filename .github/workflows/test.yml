@@ -30,6 +30,7 @@ jobs:
         toxenv:
           - py-pytest6
           - py-pytest7
+          - py-pytest8
         include:
           - python-version: '3.8'
             toxenv: lint

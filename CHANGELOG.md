@@ -1,5 +1,5 @@
-v0.5.0 (in development)
------------------------
+v0.5.0 (2024-02-11)
+-------------------
 - Migrated from setuptools to hatch
 - Drop support for Python 3.7
 - Don't cause an internal error on marker misuse with pluggy 1.4+

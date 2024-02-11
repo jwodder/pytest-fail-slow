@@ -19,7 +19,7 @@ import pytest
     ],
 )
 def test_fail_slow_setup_threshold(
-    pytester, args: list[str], decor: str, limitrgx: str | None
+    pytester: pytest.Pytester, args: list[str], decor: str, limitrgx: str | None
 ) -> None:
     pytester.makepyfile(
         test_func=(
@@ -53,7 +53,9 @@ def test_fail_slow_setup_threshold(
 
 
 @pytest.mark.parametrize("threshold,limitrgx", [(4, "4s"), (10, None)])
-def test_fail_slow_multi_setup(pytester, threshold: str, limitrgx: str | None) -> None:
+def test_fail_slow_multi_setup(
+    pytester: pytest.Pytester, threshold: str, limitrgx: str | None
+) -> None:
     pytester.makepyfile(
         test_func=(
             "from time import sleep\n"
@@ -89,7 +91,9 @@ def test_fail_slow_multi_setup(pytester, threshold: str, limitrgx: str | None) -
 
 
 @pytest.mark.parametrize("threshold,success", [(2, False), (5, True)])
-def test_fail_slow_setup_skips_test(pytester, threshold: str, success: bool) -> None:
+def test_fail_slow_setup_skips_test(
+    pytester: pytest.Pytester, threshold: str, success: bool
+) -> None:
     pytester.makepyfile(
         test_func=(
             "from pathlib import Path\n"
@@ -114,7 +118,7 @@ def test_fail_slow_setup_skips_test(pytester, threshold: str, success: bool) -> 
         assert not (pytester.path / "test.txt").exists()
 
 
-def test_fail_slow_setup_teardown_still_run(pytester) -> None:
+def test_fail_slow_setup_teardown_still_run(pytester: pytest.Pytester) -> None:
     pytester.makepyfile(
         test_func=(
             "from pathlib import Path\n"
@@ -137,7 +141,7 @@ def test_fail_slow_setup_teardown_still_run(pytester) -> None:
     assert (pytester.path / "teardown.txt").read_text() == "Torn down\n"
 
 
-def test_fail_slow_setup_all_run(pytester) -> None:
+def test_fail_slow_setup_all_run(pytester: pytest.Pytester) -> None:
     pytester.makepyfile(
         test_func=(
             "from pathlib import Path\n"
@@ -163,7 +167,7 @@ def test_fail_slow_setup_all_run(pytester) -> None:
 
 
 @pytest.mark.parametrize("args", ["", "42, 'foo'"])
-def test_fail_slow_setup_marker_bad_args(pytester, args: str) -> None:
+def test_fail_slow_setup_marker_bad_args(pytester: pytest.Pytester, args: str) -> None:
     pytester.makepyfile(
         test_func=(
             "import pytest\n"

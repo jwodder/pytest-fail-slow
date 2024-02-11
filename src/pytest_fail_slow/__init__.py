@@ -64,7 +64,7 @@ def parse_duration(s: str | int | float) -> int | float:
     return float(s) * mul
 
 
-def pytest_configure(config) -> None:
+def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line(
         "markers",
         "fail_slow(duration): Fail test if it takes more than this long to run",
@@ -120,7 +120,7 @@ def pytest_runtest_setup(item: pytest.Item) -> None:
 @pytest.hookimpl(wrapper=True)
 def pytest_runtest_makereport(
     item: pytest.Item, call: pytest.CallInfo
-) -> Generator[None, pytest.TestResult, pytest.TestResult]:
+) -> Generator[None, pytest.TestReport, pytest.TestReport]:
     report = yield
     if report.outcome != "passed":
         return report

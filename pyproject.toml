@@ -38,6 +38,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "pluggy >= 1.1",
     "pytest >= 7.0",
 ]
 

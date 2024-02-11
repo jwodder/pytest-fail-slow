@@ -114,6 +114,7 @@ def test_fail_slow_marker_bad_args(pytester, args: str) -> None:
     )
     result = pytester.runpytest()
     result.assert_outcomes()
-    result.stdout.fnmatch_lines(
-        ["*UsageError: @pytest.mark.fail_slow() takes exactly one argument"]
+    result.stdout.no_fnmatch_line("?")
+    result.stderr.fnmatch_lines(
+        ["ERROR: @pytest.mark.fail_slow() takes exactly one argument"]
     )

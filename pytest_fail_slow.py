@@ -89,11 +89,11 @@ def pytest_addoption(parser) -> None:
     )
 
 
-@pytest.hookimpl(hookwrapper=True)
+@pytest.hookimpl(wrapper=True)
 def pytest_runtest_makereport(item, call):
-    report = (yield).get_result()
-    if report is None or report.outcome != "passed":
-        return
+    report = yield
+    if report.outcome != "passed":
+        return report
     if report.when == "setup":
         mark = item.get_closest_marker("fail_slow_setup")
         if mark is not None:
@@ -126,3 +126,4 @@ def pytest_runtest_makereport(item, call):
                 "Test passed but took too long to run:"
                 f" Duration {call.duration}s > {timeout}s"
             )
+    return report

@@ -28,7 +28,6 @@ jobs:
           - 'pypy-3.9'
           - 'pypy-3.10'
         toxenv:
-          - py-pytest6
           - py-pytest7
           - py-pytest8
         include:

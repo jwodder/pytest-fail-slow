@@ -2,6 +2,8 @@ v0.5.0 (in development)
 -----------------------
 - Migrated from setuptools to hatch
 - Drop support for Python 3.7
+- Don't cause an internal error on marker misuse with pluggy 1.4+
+- Drop support for pytest 6
 
 v0.4.0 (2023-10-21)
 -------------------

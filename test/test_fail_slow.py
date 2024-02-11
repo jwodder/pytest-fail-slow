@@ -48,7 +48,7 @@ CASES = [
 
 @pytest.mark.parametrize("src,success,slow", CASES)
 def test_fail_slow_no_threshold(
-    pytester, src: str, success: bool, slow: bool  # noqa: U100
+    pytester: pytest.Pytester, src: str, success: bool, slow: bool  # noqa: U100
 ) -> None:
     pytester.makepyfile(test_func=src.format(decor=""))
     result = pytester.runpytest()
@@ -74,7 +74,7 @@ def test_fail_slow_no_threshold(
     ],
 )
 def test_fail_slow_threshold(
-    pytester,
+    pytester: pytest.Pytester,
     src: str,
     success: bool,
     slow: bool,
@@ -102,7 +102,7 @@ def test_fail_slow_threshold(
 
 
 @pytest.mark.parametrize("args", ["", "42, 'foo'"])
-def test_fail_slow_marker_bad_args(pytester, args: str) -> None:
+def test_fail_slow_marker_bad_args(pytester: pytest.Pytester, args: str) -> None:
     pytester.makepyfile(
         test_func=(
             "import pytest\n"

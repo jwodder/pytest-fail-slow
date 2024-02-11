@@ -38,7 +38,8 @@ classifiers = [
 ]
 
 dependencies = [
-    "pytest >= 6.0",
+    "pluggy >= 1.1",
+    "pytest >= 7.0",
 ]
 
 [project.entry-points."pytest11"]

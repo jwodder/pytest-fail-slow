@@ -40,7 +40,7 @@ instead be stopped early, use pytest-timeout_.
 
 Installation
 ============
-``pytest-fail-slow`` requires Python 3.8 or higher and pytest 6.0 or higher.
+``pytest-fail-slow`` requires Python 3.8 or higher and pytest 7.0 or higher.
 Just use `pip <https://pip.pypa.io>`_ for Python 3 (You have pip, right?) to
 install it::
 

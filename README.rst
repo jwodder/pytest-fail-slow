@@ -104,8 +104,8 @@ fixtures.
 
 In addition, the ``--fail-slow-setup DURATION`` option can be passed to the
 ``pytest`` command to affect all tests in that run.  If ``--fail-slow-setup``
-is given and a test has the ``fail_slow_setupresou`` marker, the duration given
-by the marker takes precedence for that test.
+is given and a test has the ``fail_slow_setup`` marker, the duration given by
+the marker takes precedence for that test.
 
 If the setup for a test takes too long to run, the test will be marked as
 "errored," the test itself will not be run, and pytest's output will include

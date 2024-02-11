@@ -15,15 +15,16 @@ instead be stopped early, use pytest-timeout_.
 Visit <https://github.com/jwodder/pytest-fail-slow> for more information.
 """
 
+from __future__ import annotations
+import re
+from typing import Generator, Union
+import pytest
+
 __version__ = "0.5.0.dev1"
 __author__ = "John Thorvald Wodder II"
 __author_email__ = "pytest-fail-slow@varonathe.org"
 __license__ = "MIT"
 __url__ = "https://github.com/jwodder/pytest-fail-slow"
-
-from numbers import Number
-import re
-import pytest
 
 TIME_UNITS = {
     "hour": 3600.0,
@@ -33,9 +34,12 @@ TIME_UNITS = {
     "us": 0.000001,
 }
 
+setup_timeout_key = pytest.StashKey[Union[int, float, None]]()
+call_timeout_key = pytest.StashKey[Union[int, float, None]]()
 
-def parse_duration(s) -> float:
-    if isinstance(s, Number):
+
+def parse_duration(s: str | int | float) -> int | float:
+    if isinstance(s, (int, float)):
         return s
     m = re.search(
         r"""
@@ -74,7 +78,7 @@ def pytest_configure(config) -> None:
     )
 
 
-def pytest_addoption(parser) -> None:
+def pytest_addoption(parser: pytest.Parser) -> None:
     parser.addoption(
         "--fail-slow",
         type=parse_duration,
@@ -89,21 +93,39 @@ def pytest_addoption(parser) -> None:
     )
 
 
+def pytest_runtest_setup(item: pytest.Item) -> None:
+    setup_mark = item.get_closest_marker("fail_slow_setup")
+    if setup_mark is not None:
+        if len(setup_mark.args) != 1:
+            raise pytest.UsageError(
+                "@pytest.mark.fail_slow_setup() takes exactly one argument"
+            )
+        setup_timeout = parse_duration(setup_mark.args[0])
+    else:
+        setup_timeout = item.config.getoption("--fail-slow-setup")
+    item.stash[setup_timeout_key] = setup_timeout
+
+    call_mark = item.get_closest_marker("fail_slow")
+    if call_mark is not None:
+        if len(call_mark.args) != 1:
+            raise pytest.UsageError(
+                "@pytest.mark.fail_slow() takes exactly one argument"
+            )
+        call_timeout = parse_duration(call_mark.args[0])
+    else:
+        call_timeout = item.config.getoption("--fail-slow")
+    item.stash[call_timeout_key] = call_timeout
+
+
 @pytest.hookimpl(wrapper=True)
-def pytest_runtest_makereport(item, call):
+def pytest_runtest_makereport(
+    item: pytest.Item, call: pytest.CallInfo
+) -> Generator[None, pytest.TestResult, pytest.TestResult]:
     report = yield
     if report.outcome != "passed":
         return report
     if report.when == "setup":
-        mark = item.get_closest_marker("fail_slow_setup")
-        if mark is not None:
-            if len(mark.args) != 1:
-                raise pytest.UsageError(
-                    "@pytest.mark.fail_slow_setup() takes exactly one argument"
-                )
-            timeout = parse_duration(mark.args[0])
-        else:
-            timeout = item.config.getoption("--fail-slow-setup")
+        timeout = item.stash[setup_timeout_key]
         if timeout is not None and call.duration > timeout:
             report.outcome = "failed"
             report.longrepr = (
@@ -111,15 +133,7 @@ def pytest_runtest_makereport(item, call):
                 f" Duration {call.duration}s > {timeout}s"
             )
     elif report.when == "call":
-        mark = item.get_closest_marker("fail_slow")
-        if mark is not None:
-            if len(mark.args) != 1:
-                raise pytest.UsageError(
-                    "@pytest.mark.fail_slow() takes exactly one argument"
-                )
-            timeout = parse_duration(mark.args[0])
-        else:
-            timeout = item.config.getoption("--fail-slow")
+        timeout = item.stash[call_timeout_key]
         if timeout is not None and call.duration > timeout:
             report.outcome = "failed"
             report.longrepr = (

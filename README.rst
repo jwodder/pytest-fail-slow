@@ -1,23 +1,25 @@
-.. image:: https://www.repostatus.org/badges/latest/active.svg
+|repostatus| |ci-status| |coverage| |pyversions| |conda| |license|
+
+.. |repostatus| image:: https://www.repostatus.org/badges/latest/active.svg
     :target: https://www.repostatus.org/#active
     :alt: Project Status: Active — The project has reached a stable, usable
           state and is being actively developed.
 
-.. image:: https://github.com/jwodder/pytest-fail-slow/actions/workflows/test.yml/badge.svg
+.. |ci-status| image:: https://github.com/jwodder/pytest-fail-slow/actions/workflows/test.yml/badge.svg
     :target: https://github.com/jwodder/pytest-fail-slow/actions/workflows/test.yml
     :alt: CI Status
 
-.. image:: https://codecov.io/gh/jwodder/pytest-fail-slow/branch/master/graph/badge.svg
+.. |coverage| image:: https://codecov.io/gh/jwodder/pytest-fail-slow/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/jwodder/pytest-fail-slow
 
-.. image:: https://img.shields.io/pypi/pyversions/pytest-fail-slow.svg
+.. |pyversions| image:: https://img.shields.io/pypi/pyversions/pytest-fail-slow.svg
     :target: https://pypi.org/project/pytest-fail-slow/
 
-.. image:: https://img.shields.io/conda/vn/conda-forge/pytest-fail-slow.svg
+.. |conda| image:: https://img.shields.io/conda/vn/conda-forge/pytest-fail-slow.svg
     :target: https://anaconda.org/conda-forge/pytest-fail-slow
     :alt: Conda Version
 
-.. image:: https://img.shields.io/github/license/jwodder/pytest-fail-slow.svg
+.. |license| image:: https://img.shields.io/github/license/jwodder/pytest-fail-slow.svg
     :target: https://opensource.org/licenses/MIT
     :alt: MIT License
 

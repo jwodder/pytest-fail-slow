@@ -1,5 +1,6 @@
 v0.6.0 (in development)
 -----------------------
+- Add `enabled` keyword argument to markers
 
 v0.5.0 (2024-02-11)
 -------------------

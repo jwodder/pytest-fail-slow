@@ -12,6 +12,30 @@ import pytest
         ([], "@pytest.mark.fail_slow_setup(2)\n", r"2s"),
         ([], "@pytest.mark.fail_slow_setup(2.0)\n", r"2\.\d+s"),
         ([], "@pytest.mark.fail_slow_setup('0.0333m')\n", r"1\.9\d+s"),
+        ([], "@pytest.mark.fail_slow_setup(2, enabled=True)\n", r"2s"),
+        ([], "@pytest.mark.fail_slow_setup(2, enabled='1 == 1')\n", r"2s"),
+        ([], "@pytest.mark.fail_slow_setup(2, enabled=False)\n", None),
+        ([], "@pytest.mark.fail_slow_setup(2, enabled='1 == 2')\n", None),
+        (
+            ["--fail-slow-setup=2"],
+            "@pytest.mark.fail_slow_setup(2, enabled=False)\n",
+            None,
+        ),
+        (
+            [],
+            "@pytest.mark.fail_slow_setup(2, enabled='config.getoption(\"--fail-slow-setup\") is not None')\n",
+            None,
+        ),
+        (
+            ["--fail-slow-setup=0"],
+            "@pytest.mark.fail_slow_setup(2, enabled='config.getoption(\"--fail-slow-setup\") is not None')\n",
+            r"2s",
+        ),
+        (
+            ["--fail-slow-setup=3"],
+            "@pytest.mark.fail_slow_setup(2, enabled='config.getoption(\"--fail-slow-setup\") is not None')\n",
+            r"2s",
+        ),
         ([], "@pytest.mark.fail_slow_setup(10)\n", None),
         (["--fail-slow-setup=30"], "@pytest.mark.fail_slow_setup(2)\n", r"2s"),
         (["--fail-slow-setup=0.01"], "@pytest.mark.fail_slow_setup(2)\n", r"2s"),
@@ -166,7 +190,9 @@ def test_fail_slow_setup_all_run(pytester: pytest.Pytester) -> None:
     assert (pytester.path / "quick.txt").read_text() == "Set up\n"
 
 
-@pytest.mark.parametrize("args", ["", "42, 'foo'"])
+@pytest.mark.parametrize(
+    "args", ["", "42, 'foo'", "enabled=False", "42, 'foo', enabled=False"]
+)
 def test_fail_slow_setup_marker_bad_args(pytester: pytest.Pytester, args: str) -> None:
     pytester.makepyfile(
         test_func=(
@@ -180,5 +206,8 @@ def test_fail_slow_setup_marker_bad_args(pytester: pytest.Pytester, args: str) -
     result = pytester.runpytest()
     result.assert_outcomes(errors=1)
     result.stdout.fnmatch_lines(
-        ["*UsageError: @pytest.mark.fail_slow_setup() takes exactly one argument"]
+        [
+            "*UsageError: @pytest.mark.fail_slow_setup() takes exactly one"
+            " positional argument"
+        ]
     )

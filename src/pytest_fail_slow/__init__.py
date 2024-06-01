@@ -16,11 +16,16 @@ Visit <https://github.com/jwodder/pytest-fail-slow> for more information.
 """
 
 from __future__ import annotations
+from collections.abc import Generator, Mapping
+import os
+import platform
 import re
-from typing import Generator, Union
+import sys
+import traceback
+from typing import Union
 import pytest
 
-__version__ = "0.5.0"
+__version__ = "0.6.0.dev1"
 __author__ = "John Thorvald Wodder II"
 __author_email__ = "pytest-fail-slow@varonathe.org"
 __license__ = "MIT"
@@ -94,27 +99,74 @@ def pytest_addoption(parser: pytest.Parser) -> None:
 
 
 def pytest_runtest_setup(item: pytest.Item) -> None:
-    setup_mark = item.get_closest_marker("fail_slow_setup")
-    if setup_mark is not None:
-        if len(setup_mark.args) != 1:
-            raise pytest.UsageError(
-                "@pytest.mark.fail_slow_setup() takes exactly one argument"
-            )
-        setup_timeout = parse_duration(setup_mark.args[0])
-    else:
-        setup_timeout = item.config.getoption("--fail-slow-setup")
-    item.stash[setup_timeout_key] = setup_timeout
+    item.stash[setup_timeout_key] = get_fail_slow_timeout(
+        item, "fail_slow_setup", "--fail-slow-setup"
+    )
+    item.stash[call_timeout_key] = get_fail_slow_timeout(
+        item, "fail_slow", "--fail-slow"
+    )
 
-    call_mark = item.get_closest_marker("fail_slow")
-    if call_mark is not None:
-        if len(call_mark.args) != 1:
-            raise pytest.UsageError(
-                "@pytest.mark.fail_slow() takes exactly one argument"
+
+def get_fail_slow_timeout(
+    item: pytest.Item, mark_name: str, option_name: str
+) -> int | float | None:
+    m = item.get_closest_marker(mark_name)
+    if m is None:
+        timeout = item.config.getoption(option_name)
+        assert isinstance(timeout, (int, float)) or timeout is None
+        return timeout
+    try:
+        (duration,) = m.args
+    except ValueError:
+        raise pytest.UsageError(
+            f"@pytest.mark.{mark_name}() takes exactly one positional argument"
+        )
+    enabled = m.kwargs.get("enabled", True)
+    if isinstance(enabled, str):
+        enabled = evaluate_enabled(item, mark_name, enabled)
+    if not enabled:
+        return None
+    return parse_duration(duration)
+
+
+def evaluate_enabled(item: pytest.Item, mark_name: str, condition: str) -> bool:
+    # Based on evaluate_condition() in _pytest/skipping.py
+    ctx = {
+        "os": os,
+        "sys": sys,
+        "platform": platform,
+        "config": item.config,
+    }
+    for dictionary in reversed(
+        item.ihook.pytest_markeval_namespace(config=item.config)
+    ):
+        if not isinstance(dictionary, Mapping):  # pragma: no cover
+            raise ValueError(
+                "pytest_markeval_namespace() needs to return a dict, got"
+                f" {dictionary!r}"
             )
-        call_timeout = parse_duration(call_mark.args[0])
-    else:
-        call_timeout = item.config.getoption("--fail-slow")
-    item.stash[call_timeout_key] = call_timeout
+        ctx.update(dictionary)
+    if hasattr(item, "obj"):
+        ctx.update(item.obj.__globals__)
+    try:
+        filename = f"<{mark_name} enabled>"
+        code = compile(condition, filename, "eval")
+        return bool(eval(code, ctx))
+    except SyntaxError as exc:
+        msglines = [
+            f"Error evaluating {mark_name!r} condition",
+            "    " + condition,
+            "    " + " " * (exc.offset or 0) + "^",
+            "SyntaxError: invalid syntax",
+        ]
+        pytest.fail("\n".join(msglines), pytrace=False)
+    except Exception as exc:
+        msglines = [
+            f"Error evaluating {mark_name!r} condition",
+            "    " + condition,
+            *traceback.format_exception_only(type(exc), exc),
+        ]
+        pytest.fail("\n".join(msglines), pytrace=False)
 
 
 @pytest.hookimpl(wrapper=True)

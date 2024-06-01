@@ -205,12 +205,12 @@ def test_fail_slow_bad_condition_syntax(pytester: pytest.Pytester) -> None:
     result.stdout.re_match_lines(
         [
             r"_+ ERROR at setup of test_func _+$",
-            "invalid syntax (<fail_slow enabled>, line 1)",
+            r"(invalid syntax(?:\. Perhaps you forgot a comma\?)?|unexpected EOF while parsing) \(<fail_slow enabled>, line 1\)",
             "",
             "During handling of the above exception, another exception occurred:",
             "Error evaluating 'fail_slow' condition",
             "    bad syntax",
-            r"         \^",
+            r" +\^",
             "SyntaxError: invalid syntax",
         ],
         consecutive=True,

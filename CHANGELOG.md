@@ -1,3 +1,7 @@
+v0.7.0 (in development)
+-----------------------
+- Support Python 3.13
+
 v0.6.0 (2024-06-01)
 -------------------
 - Add `enabled` keyword argument to markers

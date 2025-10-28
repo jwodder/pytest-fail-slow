@@ -61,7 +61,7 @@ def parse_duration(s: str | int | float) -> int | float:
         flags=re.I | re.X,
     )
     if m:
-        (unit,) = [k for k, v in m.groupdict().items() if v is not None]
+        (unit,) = (k for k, v in m.groupdict().items() if v is not None)
         mul = TIME_UNITS[unit.lower()]
         s = s[: m.start()]
     else:

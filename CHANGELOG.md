@@ -1,6 +1,6 @@
 v0.7.0 (in development)
 -----------------------
-- Support Python 3.13
+- Support Python 3.13 and 3.14
 
 v0.6.0 (2024-06-01)
 -------------------
